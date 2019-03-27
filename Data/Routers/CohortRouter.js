@@ -72,10 +72,19 @@ router.put("/:id", async (req, res) => {
 });
 
 //- `[DELETE] /api/cohorts/:id` This route should delete the specified cohort.
-router.delete("/api/cohorts", async (req, res) => {
-  // try {
-  // } catch (err) {
-  // }
+router.delete("/:id", async (req, res) => {
+  try {
+    const test = await db("cohorts")
+      .where({ id: req.params.id })
+      .del();
+    if (test > 0) {
+      res.status(200).send("Cohort deleted successfully");
+    } else {
+      res.status(404).send("Cohort records with that ID not found.");
+    }
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = router;
