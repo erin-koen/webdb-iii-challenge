@@ -9,7 +9,7 @@ exports.up = function(knex) {
       .integer("cohort_id")
       .unsigned()
       .references("id")
-      .inTable("cohorts_table")
+      .inTable("cohorts")
       .onDelete("CASCADE")
       .onUpdate("CASCADE");
   });
