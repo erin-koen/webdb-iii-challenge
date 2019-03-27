@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+exports.up = function(knex, Promise) {
   return knex.schema.createTable("cohorts", function(tbl) {
     //create a primary key, will default to being called id
     tbl.increments();

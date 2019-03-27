@@ -1,28 +1,81 @@
-const express = require('express')
-
+const express = require("express");
+const db = require("../dbConfig");
 const router = express.Router();
 
-router.post('/', (req, res) => {
-    
+// - `[POST] /api/cohorts` This route should save a new cohort to the database.
+router.post("/", async (req, res) => {
+  const { name } = req.body;
+  if (name) {
+    try {
+      const { id, name } = await db("cohorts").insert(req.body);
+      res
+        .status(200)
+        .send(`The ${name} cohort, with id number ${id}, has been created.`);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  } else {
+    res.status(404).send("A cohort needs a name.");
+  }
 });
 
-router.get('/', (req, res) => {
-    
+// - `[GET] /api/cohorts` This route will return an array of all cohorts.
+router.get("/", async (req, res) => {
+  try {
+    const cohorts = await db("cohorts");
+    res.status(200).json(cohorts);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
-router.get('/', (req, res) => {
-    
+// - `[GET] /api/cohorts/:id` This route will return the cohort with the matching `id`.
+router.get("/:id", async (req, res) => {
+  try {
+    const cohort = await db("cohorts").where({ id: req.params.id });
+    res.status(200).json(cohort);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
-router.get('/', (req, res) => {
-    
+// - `[GET] /api/cohorts/:id/students` returns all students for the cohort with the specified `id`.
+router.get("/:id/students", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const students = await db("students").where({ cohort_id: id });
+    res.status(200).json(students);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
+//- `[PUT] /api/cohorts/:id` This route will update the cohort with the matching `id` using information sent in the body of the request.
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const test = await db("cohorts")
+      .where({ id: id })
+      .update(req.body);
 
-router.put('/', (req, res) => {
-    
+    if (test > 0) {
+      const updatedCohort = await db("cohorts")
+        .where({ id: id })
+        .first();
+      res.status(200).json(updatedCohort);
+    } else {
+      res.status(404).send("The requested cohort was not found");
+    }
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
-router.delete('/', (req, res) => {
-    
+//- `[DELETE] /api/cohorts/:id` This route should delete the specified cohort.
+router.delete("/api/cohorts", async (req, res) => {
+  // try {
+  // } catch (err) {
+  // }
 });
+
+module.exports = router;
